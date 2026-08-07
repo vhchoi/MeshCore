@@ -1,6 +1,10 @@
 #include "MomentaryButton.h"
 
-#define MULTI_CLICK_WINDOW_MS  280
+#ifdef MULTI_CLICK_WINDOW_MS
+  #define EFFECTIVE_MULTI_CLICK_WINDOW_MS MULTI_CLICK_WINDOW_MS
+#else
+  #define EFFECTIVE_MULTI_CLICK_WINDOW_MS 280
+#endif
 
 MomentaryButton::MomentaryButton(int8_t pin, int long_press_millis, bool reverse, bool pulldownup, bool multiclick) { 
   _pin = pin;
@@ -13,7 +17,7 @@ MomentaryButton::MomentaryButton(int8_t pin, int long_press_millis, bool reverse
   _threshold = 0;
   _click_count = 0;
   _last_click_time = 0;
-  _multi_click_window = multiclick ? MULTI_CLICK_WINDOW_MS : 0;
+  _multi_click_window = multiclick ? EFFECTIVE_MULTI_CLICK_WINDOW_MS : 0;
   _pending_click = false;
 }
 
@@ -28,7 +32,7 @@ MomentaryButton::MomentaryButton(int8_t pin, int long_press_millis, int analog_t
   _threshold = analog_threshold;
   _click_count = 0;
   _last_click_time = 0;
-  _multi_click_window = MULTI_CLICK_WINDOW_MS;
+  _multi_click_window = EFFECTIVE_MULTI_CLICK_WINDOW_MS;
   _pending_click = false;
 }
 

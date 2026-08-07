@@ -18,7 +18,7 @@ SensorManager sensors;
 
 #ifdef DISPLAY_CLASS
   DISPLAY_CLASS display;
-  MomentaryButton user_btn(PIN_USER_BTN, 1000, true);
+  MomentaryButton user_btn(PIN_USER_BTN, 1000, false, true, false);
 #endif
 
 #ifndef LORA_CR
@@ -30,6 +30,15 @@ bool radio_init() {
   rtc_clock.begin(Wire);
 
   pinMode(PIN_STATUS_LED, OUTPUT);
+
+#if defined(PIN_TFT_VDD_CTL) && (PIN_TFT_VDD_CTL >= 0)
+  pinMode(PIN_TFT_VDD_CTL, OUTPUT);
+  #if defined(PIN_TFT_VDD_CTL_ACTIVE)
+  digitalWrite(PIN_TFT_VDD_CTL, PIN_TFT_VDD_CTL_ACTIVE);
+  #else
+  digitalWrite(PIN_TFT_VDD_CTL, HIGH);
+  #endif
+#endif
 
 #ifdef SX126X_DIO3_TCXO_VOLTAGE
   float tcxo = SX126X_DIO3_TCXO_VOLTAGE;

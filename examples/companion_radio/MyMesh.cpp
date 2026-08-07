@@ -360,7 +360,7 @@ void MyMesh::onDiscoveredContact(ContactInfo &contact, bool is_new, uint8_t path
       _serial->writeFrame(out_frame, 1 + PUB_KEY_SIZE);
     }
   } else {
-#ifdef DISPLAY_CLASS
+#if COMPANION_LCD_UI_ENABLED
     if (_ui) _ui->notify(UIEventType::newContactMessage);
 #endif
   }
@@ -464,7 +464,7 @@ void MyMesh::queueMessage(const ContactInfo &from, uint8_t txt_type, mesh::Packe
     _serial->writeFrame(frame, 1);
   }
 
-#ifdef DISPLAY_CLASS
+#if COMPANION_LCD_UI_ENABLED
   // we only want to show text messages on display, not cli data
   bool should_display = txt_type == TXT_TYPE_PLAIN || txt_type == TXT_TYPE_SIGNED_PLAIN;
   if (should_display && _ui) {
@@ -574,11 +574,11 @@ void MyMesh::onChannelMessageRecv(const mesh::GroupChannel &channel, mesh::Packe
     frame[0] = PUSH_CODE_MSG_WAITING; // send push 'tickle'
     _serial->writeFrame(frame, 1);
   } else {
-#ifdef DISPLAY_CLASS
+#if COMPANION_LCD_UI_ENABLED
     if (_ui) _ui->notify(UIEventType::channelMessage);
 #endif
   }
-#ifdef DISPLAY_CLASS
+#if COMPANION_LCD_UI_ENABLED
   // Get the channel name from the channel index
   const char *channel_name = "Unknown";
   ChannelDetails channel_details;
@@ -950,7 +950,7 @@ void MyMesh::begin(bool has_display) {
 
 #ifdef BLE_PIN_CODE // 123456 by default
   if (_prefs.ble_pin == 0) {
-#ifdef DISPLAY_CLASS
+#if COMPANION_LCD_UI_ENABLED
     if (has_display && BLE_PIN_CODE == 123456) {
       StdRNG rng;
       _active_ble_pin = rng.nextInt(100000, 999999); // random pin each session
@@ -1369,7 +1369,7 @@ void MyMesh::handleCmdFrame(size_t len) {
     int out_len;
     if ((out_len = getFromOfflineQueue(out_frame)) > 0) {
       _serial->writeFrame(out_frame, out_len);
-#ifdef DISPLAY_CLASS
+#if COMPANION_LCD_UI_ENABLED
       if (_ui) _ui->msgRead(offline_queue_len);
 #endif
     } else {
@@ -2241,7 +2241,7 @@ void MyMesh::loop() {
     dirty_contacts_expiry = 0;
   }
 
-#ifdef DISPLAY_CLASS
+#if COMPANION_LCD_UI_ENABLED
   if (_ui) _ui->setHasConnection(_serial->isConnected());
 #endif
 }
