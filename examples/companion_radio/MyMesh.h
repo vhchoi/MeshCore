@@ -67,12 +67,6 @@
 #define BLE_NAME_PREFIX "MeshCore-"
 #endif
 
-#if defined(DISPLAY_CLASS) && (!defined(ENABLE_LCD) || (ENABLE_LCD != 0))
-  #define COMPANION_LCD_UI_ENABLED 1
-#else
-  #define COMPANION_LCD_UI_ENABLED 0
-#endif
-
 #include <helpers/BaseChatMesh.h>
 #include <helpers/TransportKeyStore.h>
 

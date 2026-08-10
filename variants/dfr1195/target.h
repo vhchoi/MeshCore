@@ -7,12 +7,20 @@
 #include <helpers/radiolib/CustomSX1262Wrapper.h>
 #include <helpers/AutoDiscoverRTCClock.h>
 #include <helpers/SensorManager.h>
+
 #ifdef DISPLAY_CLASS
   #include <helpers/ui/ST7735Display.h>
   #include <helpers/ui/MomentaryButton.h>
 #endif
 
-extern ESP32Board board;
+class DFR1195Board : public ESP32Board {
+public:
+  const char* getManufacturerName() const override {
+    return "DFR1195";
+  }
+};
+
+extern DFR1195Board board;
 extern WRAPPER_CLASS radio_driver;
 extern AutoDiscoverRTCClock rtc_clock;
 extern SensorManager sensors;
