@@ -3,6 +3,8 @@
 
 DFR1195Board board;
 
+SPIClass dfr1195_tft_spi(HSPI);
+
 #if defined(P_LORA_SCLK)
   static SPIClass spi;
   RADIO_CLASS radio = new Module(P_LORA_NSS, P_LORA_DIO_1, P_LORA_RESET, P_LORA_BUSY, spi);
