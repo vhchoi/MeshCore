@@ -76,6 +76,10 @@ bool radio_init() {
   radio.setRxBoostedGainMode(SX126X_RX_BOOSTED_GAIN);
 #endif
 
+#ifdef RXPS_ENABLED
+  radio.setRxPowerSaving(true);
+#endif
+
   return true;
 }
 

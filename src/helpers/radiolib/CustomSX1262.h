@@ -8,6 +8,9 @@ class CustomSX1262 : public SX1262 {
   uint32_t _maxPayloadMillis = 3934;
   uint32_t _activityAt = 0;
   bool _headerSeen = false;
+#ifdef RXPS_ENABLED
+  bool _rxps_enabled = false;
+#endif
 
   public:
     CustomSX1262(Module *mod) : SX1262(mod) { }
@@ -102,8 +105,22 @@ class CustomSX1262 : public SX1262 {
 
     int16_t startReceive() override {
       // include the PREAMBLE_DETECTED irq bit in reported flags
-      return SX1262::startReceive(RADIOLIB_SX126X_RX_TIMEOUT_INF, RADIOLIB_IRQ_RX_DEFAULT_FLAGS | (1UL << RADIOLIB_IRQ_PREAMBLE_DETECTED), RADIOLIB_IRQ_RX_DEFAULT_MASK, 0);
+      uint32_t irqFlags = RADIOLIB_IRQ_RX_DEFAULT_FLAGS | (1UL << RADIOLIB_IRQ_PREAMBLE_DETECTED);
+#ifdef RXPS_ENABLED
+      if (_rxps_enabled) {
+        // mostly sleeps, waking only to sample for a preamble -- big RX current saving.
+        // senderPreambleLength=0 -> reuse the preamble length already set via setPreambleLength(), so this
+        // can never miss a packet as long as every node in the mesh uses the same SF/preamble convention.
+        return startReceiveDutyCycleAuto(0, 0, irqFlags, RADIOLIB_IRQ_RX_DEFAULT_MASK);
+      }
+#endif
+      return SX1262::startReceive(RADIOLIB_SX126X_RX_TIMEOUT_INF, irqFlags, RADIOLIB_IRQ_RX_DEFAULT_MASK, 0);
     }
+
+#ifdef RXPS_ENABLED
+    void setRxPowerSaving(bool enabled) { _rxps_enabled = enabled; }
+    bool getRxPowerSaving() const { return _rxps_enabled; }
+#endif
 
     bool isReceiving() {
       uint32_t irq = getIrqFlags();
