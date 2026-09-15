@@ -167,7 +167,11 @@ void UITask::newMsg(uint8_t path_len, const char* from_name, const char* text, i
 void UITask::renderBatteryIndicator(uint16_t batteryMilliVolts) {
   // Convert millivolts to percentage
 #ifndef BATT_MIN_MILLIVOLTS
-  #define BATT_MIN_MILLIVOLTS 3000
+  #ifdef AUTO_SHUTDOWN_MILLIVOLTS
+    #define BATT_MIN_MILLIVOLTS AUTO_SHUTDOWN_MILLIVOLTS
+  #else
+    #define BATT_MIN_MILLIVOLTS 3000
+  #endif
 #endif
 #ifndef BATT_MAX_MILLIVOLTS
   #define BATT_MAX_MILLIVOLTS 4200
