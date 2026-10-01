@@ -7,14 +7,14 @@
 #endif
 
 #ifndef AUTO_OFF_MILLIS
-  #define AUTO_OFF_MILLIS     15000   // 15 seconds
+  #define AUTO_OFF_MILLIS     10000   // 10 seconds
 #endif
-#define BOOT_SCREEN_MILLIS   3000   // 3 seconds
+#define BOOT_SCREEN_MILLIS   2000   // 2 seconds
 
 #ifdef PIN_STATUS_LED
-#define LED_ON_MILLIS     20
-#define LED_ON_MSG_MILLIS 200
-#define LED_CYCLE_MILLIS  4000
+#define LED_ON_MILLIS     10
+#define LED_ON_MSG_MILLIS 100
+#define LED_CYCLE_MILLIS  10000
 #endif
 
 #define LONG_PRESS_MILLIS   1200
@@ -154,6 +154,21 @@ class HomeScreen : public UIScreen {
 #endif
   }
 
+#ifdef UI_SHOW_UPTIME
+  void formatUptime(char* dest, size_t len) {
+    static uint32_t prev_ms = 0;
+    static uint32_t rollovers = 0;
+    uint32_t now = millis();
+    if (now < prev_ms) rollovers++;   // millis() wraps every ~49.7 days
+    prev_ms = now;
+
+    uint32_t hours = (uint32_t) ((((uint64_t)rollovers << 32) + now) / 3600000ULL);
+    uint32_t days = hours / 24;
+    if (days > 99) days = 99;
+    snprintf(dest, len, "%02ud%02uh", (unsigned) days, (unsigned) (hours % 24));
+  }
+#endif
+
   CayenneLPP sensors_lpp;
   int sensors_nb = 0;
   bool sensors_scroll = false;
@@ -201,8 +216,21 @@ public:
     display.setColor(UIColor::title_txt);
     char filtered_name[sizeof(_node_prefs->node_name)];
     display.translateUTF8ToBlocks(filtered_name, _node_prefs->node_name, sizeof(filtered_name));
+#ifdef UI_SHOW_UPTIME
+    char uptime[12];
+    formatUptime(uptime, sizeof(uptime));
+    // sits just left of the battery icon, which starts at width() - 29
+    int uptime_x = display.width() - 33 - display.getTextWidth(uptime);
+    for (int n = strlen(filtered_name); n > 0 && display.getTextWidth(filtered_name) > uptime_x - 3; n--) {
+      filtered_name[n - 1] = 0;   // keep the node name clear of the uptime field
+    }
+#endif
     display.setCursor(0, 2);
     display.print(filtered_name);
+#ifdef UI_SHOW_UPTIME
+    display.setCursor(uptime_x, 2);
+    display.print(uptime);
+#endif
 
     // battery voltage
     renderBatteryIndicator(display, _task->getBattMilliVolts());
