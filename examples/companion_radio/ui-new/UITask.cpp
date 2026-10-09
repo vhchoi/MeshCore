@@ -162,10 +162,12 @@ class HomeScreen : public UIScreen {
     if (now < prev_ms) rollovers++;   // millis() wraps every ~49.7 days
     prev_ms = now;
 
-    uint32_t hours = (uint32_t) ((((uint64_t)rollovers << 32) + now) / 3600000ULL);
+    uint64_t total_minutes = ((((uint64_t)rollovers << 32) + now) / 60000ULL);
+    uint64_t hours = total_minutes / 60;
     uint32_t days = hours / 24;
     if (days > 99) days = 99;
-    snprintf(dest, len, "%02ud%02uh", (unsigned) days, (unsigned) (hours % 24));
+    snprintf(dest, len, "%02ud%02uh%02um", (unsigned) days,
+      (unsigned) (hours % 24), (unsigned) (total_minutes % 60));
   }
 #endif
 
@@ -317,6 +319,10 @@ public:
       display.print(tmp);
       display.setCursor(0, 53);
       sprintf(tmp, "Noise floor: %d", radio_driver.getNoiseFloor());
+      display.print(tmp);
+
+      display.setCursor(0, 64);
+      snprintf(tmp, sizeof(tmp), "Bat: %.2fV", (float) _task->getBattMilliVolts() / 1000.0f);
       display.print(tmp);
     } else if (_page == HomePage::BLUETOOTH) {
       display.setColor(UIColor::corp_blue);
