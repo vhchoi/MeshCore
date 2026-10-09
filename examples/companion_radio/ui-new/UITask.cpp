@@ -313,16 +313,13 @@ public:
       sprintf(tmp, "BW: %03.2f     CR: %d", _node_prefs->bw, _node_prefs->cr);
       display.print(tmp);
 
-      // tx power,  noise floor
+      // tx power, bat,  noise floor
       display.setCursor(0, 42);
-      sprintf(tmp, "TX: %ddBm", _node_prefs->tx_power_dbm);
-      display.print(tmp);
-      display.setCursor(0, 53);
-      sprintf(tmp, "Noise floor: %d", radio_driver.getNoiseFloor());
+      sprintf(tmp, "TX: %ddBm     Bat: %.2fV", _node_prefs->tx_power_dbm, (float) _task->getBattMilliVolts() / 1000.0f);
       display.print(tmp);
 
-      display.setCursor(0, 64);
-      snprintf(tmp, sizeof(tmp), "Bat: %.2fV", (float) _task->getBattMilliVolts() / 1000.0f);
+      display.setCursor(0, 53);
+      sprintf(tmp, "Noise floor: %d", radio_driver.getNoiseFloor());
       display.print(tmp);
     } else if (_page == HomePage::BLUETOOTH) {
       display.setColor(UIColor::corp_blue);
