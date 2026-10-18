@@ -40,7 +40,7 @@ class UITask : public AbstractUITask {
   int next_backlight_btn_check = 0;
 #ifdef PIN_STATUS_LED
   int led_state = 0;
-  int next_led_change = 0;
+  unsigned long next_led_change = 0;
   int last_led_increment = 0;
 #endif
 

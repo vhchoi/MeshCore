@@ -14,7 +14,7 @@
 #ifdef PIN_STATUS_LED
 #define LED_ON_MILLIS     10
 #define LED_ON_MSG_MILLIS 100
-#define LED_CYCLE_MILLIS  10000
+#define LED_CYCLE_MILLIS  30000
 #endif
 
 #define LONG_PRESS_MILLIS   1200
@@ -710,8 +710,14 @@ void UITask::newMsg(uint8_t path_len, const char* from_name, const char* text, i
 
 void UITask::userLedHandler() {
 #ifdef PIN_STATUS_LED
-  int cur_time = millis();
-  if (cur_time > next_led_change) {
+  unsigned long cur_time = millis();
+  if (hasConnection()) {
+    led_state = !LED_STATE_ON;
+    digitalWrite(PIN_STATUS_LED, !LED_STATE_ON);
+    next_led_change = cur_time + LED_CYCLE_MILLIS;
+    return;
+  }
+  if ((long)(cur_time - next_led_change) >= 0) {
     if (led_state == 0) {
       led_state = 1;
       if (_msgcount > 0) {
