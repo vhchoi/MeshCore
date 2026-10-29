@@ -315,10 +315,14 @@ void setup() {
 #endif
 
   // Configure Power Management
+#if defined(DFR1195) && defined(BLE_PIN_CODE) && CONFIG_IDF_TARGET_ESP32S3
+  pm_config = { .max_freq_mhz = ESP32_CPU_FREQ, .min_freq_mhz = 10, .light_sleep_enable = false };
+#else
 #ifdef ESP32_CPU_FREQ
   pm_config = { .max_freq_mhz = ESP32_CPU_FREQ, .min_freq_mhz = 40, .light_sleep_enable = true };
 #else
   pm_config = { .max_freq_mhz = 80, .min_freq_mhz = 40, .light_sleep_enable = true };
+#endif
 #endif
   esp_err_t errPM = esp_pm_configure(&pm_config);
   if (errPM == ESP_OK) {
